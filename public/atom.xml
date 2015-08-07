@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  
+  <title><![CDATA[BlackSheep]]></title>
+  <subtitle><![CDATA[Let every blog records your growth]]></subtitle>
+  <link href="/atom.xml" rel="self"/>
+  <link href="http://yoursite.com//"/>
+  <updated>2015-08-07T16:39:19.000Z</updated>
+  <id>http://yoursite.com//</id>
+  
+  <author>
+    <name><![CDATA[Luke06122463]]></name>
+    <email><![CDATA[lukaihaoshuai@outlook.com]]></email>
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[hex to unicode]]></title>
+    <link href="http://yoursite.com/2015/08/08/hex-to-unicode/"/>
+    <id>http://yoursite.com/2015/08/08/hex-to-unicode/</id>
+    <published>2015-08-07T16:27:05.000Z</published>
+    <updated>2015-08-07T16:39:19.000Z</updated>
+    <content type="html"><![CDATA[<p>Sometimes, we need to read data from old-fashioned devise. Unfortunately, many old-fashioned devise doesn’t support unicode very well. So we need to translate data from any format to unicode.</p>
+<a id="more"></a>
+<p>Now things become clear that the string returned by ldap API is hex rather than Unicode. We need to format these string to utf-8 before taking any advantage of them.</p>
+<p>There are mainly two ways to use ldap result:</p>
+<ol>
+<li>show the ldap result on web client</li>
+<li>store the ldap result to elasticsearch</li>
+</ol>
+<p>I write a common function to finish the formatting work and here is its definition:<br><img src="/img/unicode_001.jpg" alt="Alt text"></p>
+<p>You can use the function to format every ldap result with the usage of <em>Format::String.format_json_to_unicode(source)</em></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Sometimes, we need to read data from old-fashioned devise. Unfortunately, many old-fashioned devise doesn’t support unicode very well. So we need to translate data from any format to unicode.</p>]]>
+    
+    </summary>
+    
+      <category term="RubyOnRails" scheme="http://yoursite.com/categories/RubyOnRails/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[nginxSubDomain]]></title>
+    <link href="http://yoursite.com/2015/08/08/nginx-sub-domain/"/>
+    <id>http://yoursite.com/2015/08/08/nginx-sub-domain/</id>
+    <published>2015-08-07T16:25:32.000Z</published>
+    <updated>2015-08-07T16:46:34.000Z</updated>
+    <content type="html"><![CDATA[<p>In order to make the search web and admin search share the same root url (<a href="https://localhost" target="_blank" rel="external">https://localhost</a>) and distinguish each by sub domain(/admin and /search respectively), we need to modify most URL in our project since currently we use absolute path to visit resource.</p>
+<p>When we configure nginx to support it, we need to change the way of how we request resource. </p>
+<p>For example, currently we access an image with the url of “<a href="https://localhost:3000/assets/image01.jpg”" target="_blank" rel="external">https://localhost:3000/assets/image01.jpg”</a>. But after we turn on nginx’s sub domain functionality, we need to change the way to “<a href="https://localhost/admin/assets/image01.jpg”" target="_blank" rel="external">https://localhost/admin/assets/image01.jpg”</a>  </p>
+<p>Actually, we need to change all the url on our web pages. </p>
+<h2 id="Here_is_the_resource_category:">Here is the resource category:</h2><ol>
+<li>Assets<br>1-a. Style sheets<br>1-b. Javascript files<br>1-c. Image on the html<br>1-d. Image in css<br>1-e. Image inserted into html by js</li>
+</ol>
+<ol>
+<li>Request url<br> 2-a. url on html (hyper link &amp; form)<br> 2-b. url in js (such as ajax url)</li>
+</ol>
+<p>With some investigation, we found we can take advantage of Rails tag to solve the problem.</p>
+<p>When we set  <em>config.relative_url_root = “/admin”</em>  in application.rb, then Rails will prepend  <em>“/admin”</em>  when generating links. So we need to use rails tag in our project as more as possible.</p>
+<h3 id="As_to_1-a_(style_sheets)_and_1-b_(javascript_files)">As to 1-a (style sheets) and 1-b (javascript files)</h3><p>I use rails tag ‘javascript_include_tag’ and ‘stylesheet_link_tag’ to request css &amp; js resource.</p>
+<p>Before:<br><img src="/img/nginx_001.jpg" alt="Alt text"></p>
+<p>After:<br><img src="/img/nginx_002.jpg" alt="Alt text"></p>
+<p>Now 1-a (style sheets) and 1-b (javascript files) can be requested in sub-domain mode.</p>
+<h3 id="As_to_1-c_(Image_on_the_html)_and_2-a_(url_on_html)">As to 1-c (Image on the html) and 2-a (url on html)</h3><p>There are two ways to introduce them into html.</p>
+<p>One way is  creating them with rails tag, such as image_path. Since the url is created by rails tag, then it should work well in sub-domain mode. Just leave it alone.</p>
+<p>The other way is the url is specified by developer. The url can be relative-path and it also can be absolute-path.</p>
+<ol>
+<li>If it is relative-path, then it would work well in sub-domain mode.</li>
+<li>If it is absolute-path, then we need to prepend the sub-domain for the url. Fortunately, we can get the sub-domian  from  <em>config.relative_url_root</em> and what we need to do is only adding the <em>relative_url_root</em> before the url.</li>
+</ol>
+<p>I store <em>relative_url_root</em> into the variable <em>@root_url</em>.<br><img src="/img/nginx_003.jpg" alt="Alt text"></p>
+<p>So if you request an image in html with the following way:<br><img src="/img/nginx_004.jpg" alt="Alt text"><br>Now you need to change it to:<br><img src="/img/nginx_005.jpg" alt="Alt text"></p>
+<h3 id="As_to_1-d_(Image_in_css)">As to 1-d (Image in css)</h3><p>We can use relative-path to access image</p>
+<p>Before:<br><img src="/img/nginx_006.jpg" alt="Alt text"></p>
+<p>After:<br><img src="/img/nginx_007.jpg" alt="Alt text"></p>
+<h3 id="As_to_1-e(Image_inserted_into_html_by_js)_and_2-b_(url_in_js)">As to 1-e(Image inserted into html by js) and 2-b (url in js)</h3><p>The url must be specified by developer. So,</p>
+<ol>
+<li>If it is relative-path, then it would work well in sub-domain mode.</li>
+<li>If it is absolute-path, then we need to prepend the sub-domain for the url.</li>
+</ol>
+<p>There is a global js variable <em>global_root_url</em> which represent the <em>relative_url_root</em></p>
+<p>So if you specify url in js with the following way:<br><img src="/img/nginx_008.jpg" alt="Alt text"></p>
+<p>Then you need to change it to:<br><img src="/img/nginx_009.jpg" alt="Alt text"></p>
+<p>Besides, when we use redirect_to to redirect user to some page, then we also need to specify the sub domain for url.<br>Before:<br><img src="/img/nginx_010.jpg" alt="Alt text"><br>After:<br><img src="/img/nginx_011.jpg" alt="Alt text"></p>
+<p>Actually, if we don’t set <em>config.relative_url_root</em>, then both <em>@root_url</em>  and <em>global_root_url</em> are empty string.</p>
+<p>I have tested it in my environment and it works well both in development and production mode.</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>In order to make the search web and admin search share the same root url (<a href="https://localhost" target="_blank" rel="external">http]]>
+    </summary>
+    
+      <category term="RubyOnRails" scheme="http://yoursite.com/categories/RubyOnRails/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Python的类机制]]></title>
+    <link href="http://yoursite.com/2015/08/06/Python%E7%9A%84%E7%B1%BB%E6%9C%BA%E5%88%B6/"/>
+    <id>http://yoursite.com/2015/08/06/Python的类机制/</id>
+    <published>2015-08-06T14:20:09.000Z</published>
+    <updated>2015-08-06T14:22:29.000Z</updated>
+    <content type="html"><![CDATA[<p>首先参照图（*）， 我们可知Python在类机制的实现中引入了两个很纠结的概念：PyTypeObject和基类，从而引出了Class与Instance以及基类和子类的概念。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>首先参照图（*）， 我们可知Python在类机制的实现中引入了两个很纠结的概念：PyTypeObject和基类，从而引出了Class与Instance以及基类和子类的概念。</p>
+]]>
+    </summary>
+    
+      <category term="Python" scheme="http://yoursite.com/categories/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Pipeline in RubyOnRails]]></title>
+    <link href="http://yoursite.com/2015/08/06/pipeline-in-rubyOnRails/"/>
+    <id>http://yoursite.com/2015/08/06/pipeline-in-rubyOnRails/</id>
+    <published>2015-08-06T14:14:05.000Z</published>
+    <updated>2015-08-07T16:24:53.000Z</updated>
+    <content type="html"><![CDATA[<p>Here is a simple introduction about how to use pipeline in Rails Framework step by step.<br><a id="more"></a></p>
+<p>Last week I spent several days on studying on how Rails pipeline works. I鈥檇 like to share you with what I finally found. Maybe we can take its advantage in future release.</p>
+<p>There are several steps of applying pipeline into our project:</p>
+<h2 id="Prepare_folders">Prepare folders</h2><p>Create folders under “app/assets” for each resource(here each controller is a resource) to store all related static files(js, css, image). For dashboards, we need to create two folders, under “app/assets/javascript” and “app/assets/stylesheet” respectively.<br><img src="/img/pipeline_001.jpg" alt="Alt text"></p>
+<p>After the creation of the folders is done, we need to move the related js resource and css resource to that folders.</p>
+<h2 id="Create_manifest">Create manifest</h2><p>Create a manifest for each resource to describe its static files. For dashboards, we need to create two manifest files, dashboards.js and dashboards.css<br><img src="/img/pipeline_002.jpg" alt="Alt text"></p>
+<h2 id="Config_manifest">Config manifest</h2><p>In the manifest, we need to point out which static files should be compressed into a single file.</p>
+<ul>
+<li><p>dashboard.js<br><img src="/img/pipeline_003.jpg" alt="Alt text"></p>
+</li>
+<li><p>dashboard.css<br><img src="/img/pipeline_004.jpg" alt="Alt text"></p>
+</li>
+</ul>
+<h2 id="Set_the_precompile_list">Set the precompile list</h2><p>All the static files that need to be compressed by pipeline should be specified explicitly in config/application.rb<br><img src="/img/pipeline_005.jpg" alt="Alt text"></p>
+<h2 id="Compress_static_files">Compress static files</h2><p>Compress all the resource files with the command of <em>RAILS_ENV=production bin/rake assets:precompile</em></p>
+<p>After compression, the name of resource file will be changed:<br><img src="/img/pipeline_006.jpg" alt="Alt text"></p>
+<h2 id="Refer_compressed_resource">Refer compressed resource</h2><p>Add reference to the compressed resource file in application.html.erb. Here is the sample code:<br><img src="/img/pipeline_007.jpg" alt="Alt text"></p>
+<p>Each page will only load its corresponding resource file. For example, dashboards page will only load dashboards.js and dashboards.css.<br>    聽<br>Since the all the js files have been compressed into dashboard.js and all the css file into dashboards.css, it would be sufficient for dashboards page to load only dashboards.js and dashboards.css</p>
+<h2 id="Deal_with_images">Deal with images</h2><p>After applying pipeline, all images’ name will be changed. So we need to use rails tag to display image.</p>
+<p>Firstly, we can use css to present image instead of img tag.</p>
+<p>Then, We need to use .css.erb so that we can take the advantage of Rails Helper to convert the image鈥檚 name to its real name.<br><img src="/img/pipeline_008.jpg" alt="Alt text"></p>
+<h2 id="Production_Model">Production Model</h2><p>Switch the web server to production environment with the command of rails server 鈥揺 production</p>
+<p><em>Now we can access the compressed resource file in production model.</em></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Here is a simple introduction about how to use pipeline in Rails Framework step by step.<br>]]>
+    
+    </summary>
+    
+      <category term="RubyOnRails" scheme="http://yoursite.com/categories/RubyOnRails/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Hello World]]></title>
+    <link href="http://yoursite.com/2015/08/01/hello-world/"/>
+    <id>http://yoursite.com/2015/08/01/hello-world/</id>
+    <published>2015-08-01T14:14:05.000Z</published>
+    <updated>2015-08-06T14:25:35.000Z</updated>
+    <content type="html"><![CDATA[<p>Welcome to Black Sheep’s blog.</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Welcome to Black Sheep’s blog.</p>
+]]>
+    </summary>
+    
+      <category term="BlackSheep" scheme="http://yoursite.com/categories/BlackSheep/"/>
+    
+  </entry>
+  
+</feed>
