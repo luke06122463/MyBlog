@@ -1514,6 +1514,12 @@ section.comment {
   -ms-transition: color 0.5s;
   transition: color 0.5s;
 }
+.link_icon {
+  height: 30px;
+  width: 30px;
+  float: left;
+  margin-top: 5px;
+}
 @media only screen and (min-width: 768px) {
   .categorieslist {
     width: 45%;
